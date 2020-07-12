@@ -77,14 +77,15 @@
 
 \textsc{\LARGE Università degli studi di Milano-Bicocca}\\[1cm] % Name of your university/college
 \textsc{\Large Metodi del Calcolo Scientifico }\\[0.3cm] % Major heading such as course name
-\textsc{\large Project 1}\\[0.1cm] % Minor heading such as course title
+\textsc{\large Project 2}\\[0.1cm] % Minor heading such as course title
 
 %----------------------------------------------------------------------------------------
 %	TITLE SECTION
 %----------------------------------------------------------------------------------------
 
 \HRule \\[0.4cm]
-{ \huge \bfseries Sistemi lineari con matrici sparse simmetriche e definite positive}\\[0.4cm] % Title of your document
+{ \huge \bfseries Compressione di immagini tramite la
+DCT}\\[0.4cm] % Title of your document
 \HRule \\[1.5cm]
  
 %----------------------------------------------------------------------------------------
@@ -121,16 +122,35 @@ Curnis Giovanni - 807424 \\[1cm]
 \tableofcontents
 
 \chapter{Introduzione}
-Scopo di questo progetto era confrontare librerie Open source a Matlab in sistemi operativi diversi per la risoluzione di uno stesso problema, l'implementazione del metodo di Choleski per risolvere sistemi lineari per matrici sparse, simmetriche e definite positive.
+Questo progetto è diviso in due fasi: della prima fase è implementare un algoritmo di $DCT_2$ in ambiente Open Source e confrontare questa implementazione con quella di una libreria ottimizzata, scopo della seconda fase è creare un interfaccia che consenta di comprimere immagini in toni di grigio per immagini in formato BMP.
 
-Per risolvere i sistemi sono stati usati: \textbf{Matlab 2020a} ed \textbf{Octave 5.2}, inoltre per Linux è stata testata anche una libreria di \textbf{Python 3.6}.
-
-Le tre metriche tenute in considerazione per il progetto sono state: il tempo necessario per risolvere il sistema, la quantità di memoria utilizzata e l'errore relativo.
-
-    
 \chapter{Cenni teorici}
-\section{Matrice simmetrica}
-Detta $A^T$ la matrice trasposta di $A$, una matrice $A$ è simmetrica~\cite{matsim} quando $A^T=A$.
+
+Per codificare una immagine in scala di grigi o a colori l'operazione che viene effettuata la maggior parte delle volte è quella della trasformata che consente di rappresentare i pixel, normalmente rappresentati da una matrice contenete i valori di luminosità di ogni pixel, in una rappresentazione tramite frequenze. In questo tipo di rappresentazione le onde a bassa frequenza rendono conto dell'andamento generale della luminosità dell'immagine, mentre quelle ad alta frequenza codificano i dettagli e il disturbo introdotto dall'elettronica dei dispositivi di acquisizione.
+
+Normalmente le immagini fotografiche hanno un andamento continuo e quindi la rappresentazione nel dominio delle frequenze  è spesso costituita da una matrice quadrata di valori, dei quali solo quelli corrispondenti alle basse frequenze sono significativi e si trovano nell'angolo in alto a sinistra mentre le frequenze alte hanno una rilevanza minore.
+
+Attenuare ulteriormente le componenti meno significative è possibile, basta dividere ogni coefficiente della matrice trasformata per un certo valore specificato in una tabella, così facendo la matrice risultante conterrà numerosi valori nulli. Questa operazione però causa una grande perdita di qualità ed è nota come quantizzazione e viene usata per ottenere una elevata compressione dell'immagine.
+
+\section{$DCT_2$}
+I gruppi di standardizzazione JPEG e MPEG utilizzano la \textbf{Trasformata Discreta del Coseno (DCT)} che essendo capace di rivelare le variazioni di informazione tra un’area e quella contigua trascurando le ripetizioni provvede alla compressione spaziale. Inoltre, essa rappresenta un ottimo compromesso complessità-prestazioni.
+
+Tuttavia la complessità dell'algoritmo DCT cresce molto rapidamente al crescere delle dimensioni dell'immagine e per questa ragione la DCT viene applicata su blocchi più piccoli, ad esempio di 8x8 \textit{px} nei quali viene scomposta.
+
+I numeri contenuti in questi blocchi 8x8 vengono detti \textbf{coefficienti DCT} e descrivono il contenuto delle frequenze sia alte che basse in quel blocco. In teoria questa trasformata dovrebbe essere fedele ma le operazioni in virgola mobile coinvolte e le varie operazioni inducono degli errori di rappresentazione e causano delle perdite di informazione.
+
+Una conseguenza vantaggiosa della DCT è che i valori significativi saranno trasportati in alto a sinistra.
+
+Questo ragionamento è facilmente applicabile anche a più dimensioni. Prendendo un considerazione un array il cui indice è bidimensionale otterremo la seguente formula:
+\begin{equation}
+    c_{kl} = \alpha_{Kl} \sum^{N-1}_{i=0} \sum^{M-1}_{j=0} f_{ij} \cos ( k \pi \frac{2i + 1}{2N} ) \cos (l \pi \frac{2j + 1}{2M})
+\end{equation}
+
+\begin{itemize}
+  \item The individual entries are indicated with a black dot, a so-called bullet.
+  \item The text in the entries may be of any length.
+\end{itemize}
+
 
 \section{Matrice definita positiva}
 In matematica, e più precisamente in algebra lineare, una matrice definita positiva~\cite{matpos} è una matrice quadrata $A$ tale che, detto  $x^*$  il trasposto complesso coniugato di $x$ , si verifica che la parte reale di $x^*Ax$ è positiva per ogni vettore complesso \begin{math} x \neq 0\end{math}.
